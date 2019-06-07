@@ -1,22 +1,61 @@
 import React, { Component } from 'react';
 import './App.css';
-/*
- to wire this component up you're going to need a few things.
- I'll let you do this part on your own. 
- Just remember, `how do I `connect` my components to redux?`
- `How do I ensure that my component links the state to props?`
- */
+import { connect } from 'react-redux';
+import SmurfList from "./SmurfList";
+import SmurfForm from "./SmurfForm";
+import Smurf from "./Smurf"
+
+import { fetchSmurf } from './actions';
+
+
 class App extends Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      newSmurf: ''
+    };
+    this.addSmurf = this.addSmurf.bind(this);
+    this.updateNewSmurf = this.updateNewSmurf.bind(this);
+  }
+
+  addSmurf(event) {
+    event.preventDefault();
+    this.props.addSmurf({
+      value: this.state.newSmurf,
+      complete: false
+    });
+    this.setState({
+      newSmurf: ''
+    });
+  }
+
+  updateNewSmurf(event) {
+    this.setState({
+      newSmurf: event.target.value
+    });
+  }
+
   render() {
     return (
       <div className="App">
-        <h1>SMURFS! 2.0 W/ Redux</h1>
-        <div>Welcome to your Redux version of Smurfs!</div>
-        <div>Start inside of your `src/index.js` file!</div>
-        <div>Have fun!</div>
+      <h1>SMURFS! 2.0 W/ Redux</h1>
+      <form onSubmit={this.addSmurf}>
+        <input
+        onChange={this.updateNewSmurf}
+        placeholder="New Smurf"
+        value={this.state.newSmurf}
+        />
+      </form>
+      <SmurfList smurfs={this.props.smurfs} />
       </div>
     );
   }
 }
 
-export default App;
+mapStateToProps = (state) => {
+  return{
+    smurfs: state.smurfs
+  }
+}
+
+export default connect(mapStateToProps, { fetchSmurf }) (App);
